@@ -39,7 +39,7 @@ void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS)
             std::string c1 = iRDT.p06RelatingIFCDOORSTYLE->p03Name;
             IFCdoorToList.ws_p00_IFCDOORSTYLEName = std::wstring(c1.begin(), c1.end());
 
-            c1 = std::to_string(j+1);
+            c1 = std::to_string(j + 1);
             IFCdoorToList.ws_p01_IFCDOORSTYLENum = std::wstring(c1.begin(), c1.end());
 
             c1 = iRDT.p05RelatedIFCDOORS[j]->p03Name;

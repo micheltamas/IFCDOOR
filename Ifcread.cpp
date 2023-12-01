@@ -12,6 +12,7 @@ void IFCDOORRELOBJECTS::ReadIfcDoors(std::string temp)
 
 	std::stringstream pString0(temp);
 	std::getline(pString0, iDoor.p00IfcId, '=');
+	PurgeSpaces(&iDoor.p00IfcId);
 
 	std::string sTemp(temp.substr(iBeg));
 	
@@ -43,6 +44,7 @@ void IFCDOORRELOBJECTS::ReadIfcDoorStyles(std::string temp)
 
 	std::stringstream pString0(temp);
 	std::getline(pString0, iDS.p00IfcId, '=');
+	PurgeSpaces(&iDS.p00IfcId);
 
 	std::string sTemp(temp.substr(iBeg));
 
@@ -69,6 +71,7 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 
 	std::stringstream pString0(temp);
 	std::getline(pString0, iRelT.p00IfcId, '=');
+	PurgeSpaces(&iRelT.p00IfcId);
 
 	std::string sTemp(temp.substr(iBeg));
 
@@ -88,7 +91,7 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 
 		if (tempDSs == IFCDOORSTYLES[i].p00IfcId)
 		{
-			iRelT.p06RelatingIFCDOORSTYLE = &IFCDOORSTYLES[i];
+			iRelT.p06RelatingIFCDOORSTYLE = i;
 
 			for (int k = 0; k < to_store.size(); k++)
 			{
@@ -96,7 +99,10 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 
 				{
 					if (to_store[k] == IFCDOORS[j].p00IfcId)
-						iRelT.p05RelatedIFCDOORS.push_back(&IFCDOORS[j]);
+					{
+						iRelT.p05RelatedIFCDOORS.push_back(j);
+						IFCDOORS[j].shpDoorstyle = i;
+					}
 				}
 			}
 		}
@@ -114,6 +120,7 @@ void IFCDOORRELOBJECTS::ReadIfcMaterials(std::string temp)
 	
 	std::stringstream pString0(temp);
 	std::getline(pString0, iMat.p00IfcId, '=');
+	PurgeSpaces(&iMat.p00IfcId);
 
 	std::string sTemp(temp.substr(iBeg));
 
@@ -124,8 +131,8 @@ void IFCDOORRELOBJECTS::ReadIfcMaterials(std::string temp)
 
 void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
 {
-
-	*IFCS = {};
+	
+	IFCS->Reset();
 	std::wstring ws(szFile);
 	std::string ifcFile = std::string(ws.begin(), ws.end());
 

@@ -7,12 +7,26 @@
 #include "resource.h"
 #include <windows.h>
 #include <Commdlg.h>
+#include <list>
+#include <array>
 
-
+void PurgeSpaces(std::string* str);
 void ParseSingleProp(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnum(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnd(std::string* sTemp, std::string* to_store);
 void ParseMultiPropBrace(std::string* sTemp, std::vector<std::string>* to_store);
+
+template <typename T>
+T getList(std::list<T> _list, int _i) 
+{
+	std::list<T>::template iterator it = _list.begin();
+	
+	for (int i = 0; i < _i; i++) 
+	{
+	++it;
+	}
+	return *it;
+}
 
 struct IFCCOMMON
 {
@@ -35,7 +49,7 @@ struct IFCDOORCOMW :IFCCOMMON
 
 
 
-using tvIFCDOORCOMW = std::vector<IFCDOORCOMW>;
+using tvIFCDOORCOMW = std::list<IFCDOORCOMW>;
 
 struct IFCDOORSTOLISTW
 {
@@ -51,29 +65,8 @@ struct IFCDOORSTOLISTW
 
 using tvIFCDOORSTOLISTW = std::vector<IFCDOORSTOLISTW>;
 
-struct IFCDOOR :IFCCOMMON
-{
-	//std::string p00IfcId;
-	std::string p01GlobalId;
-	std::string p02OwnerHistory;
-	std::string p03Name;
-	std::string p04Description;
-	std::string p05ObjectType;
-	std::string p06ObjectPlacement;
-	std::string p07Representation;
-	std::string p08Tag;
-	double p09OverallHeight;
-	double p10OverallWidth;
-
-};
-
-using tvIFCDOOR = std::vector<IFCDOOR>;
-
-
-
 struct IFCDOORSTYLE :IFCCOMMON
 {
-	//std::string p00IfcId;
 	std::string p01GlobalId;
 	std::string p02OwnerHistory;
 	std::string p03Name;	
@@ -84,39 +77,57 @@ struct IFCDOORSTYLE :IFCCOMMON
 	std::string  p08Tag;
 	std::string p09IfcDoorStyleOperationEnum;
 	std::string p10IfcDoorStyleConstructionEnum;
+
 };
 
 using tvIFCDOORSTYLE = std::vector<IFCDOORSTYLE>;
 
+struct IFCDOOR :IFCCOMMON
+{
+		std::string p01GlobalId;
+		std::string p02OwnerHistory;
+		std::string p03Name;
+		std::string p04Description;
+		std::string p05ObjectType;
+		std::string p06ObjectPlacement;
+		std::string p07Representation;
+		std::string p08Tag;
+		double p09OverallHeight;
+		double p10OverallWidth;
+		int shpDoorstyle = -1;
+
+};
+
+using tvIFCDOOR = std::vector<IFCDOOR>;
+
+
+
 struct IFCRELDEFINESBYTYPE :IFCCOMMON
 {
-	//std::string p00IfcId;
 	std::string p01GlobalId;
 	std::string p02OwnerHistory;
 	std::string p03Name;
 	std::string p04Description;
-	std::vector<IFCDOOR*> p05RelatedIFCDOORS;
-	IFCDOORSTYLE* p06RelatingIFCDOORSTYLE;
+	std::vector<int> p05RelatedIFCDOORS;
+	int p06RelatingIFCDOORSTYLE;
 };
 
 using tvIFCRELDEFINESBYTYPE = std::vector<IFCRELDEFINESBYTYPE>;
 
 struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 {
-	//std::string p00IfcId;
 	std::string p01GlobalId;
 	std::string p02OwnerHistory;
 	std::string p03Name;
 	std::string p04Description;
 	std::vector<std::string> p05RelatedObjects;
-	std::string p06RelatingType;
+	int p06RelatingType;
 };
 
 using tvIFCRELASSOCIATESMATERIAL = std::vector<IFCRELASSOCIATESMATERIAL>;
 
 struct IFCMATERIAL :IFCCOMMON
 {
-	//std::string p00IfcId;
 	std::string p01Material;
 };
 
@@ -124,7 +135,6 @@ using tvIFCMATERIAL = std::vector<IFCMATERIAL>;
 
 struct IFCMATERIALLIST :IFCCOMMON
 {
-	//std::string p00IfcId;
 	std::vector<std::string> p01RelatedObjects;
 };
 
@@ -144,8 +154,6 @@ enum IFCDOORRELOBJECTS_ENUM
 
 struct IFCDOORRELOBJECTS
 {
-	//template<typename T>
-	//std::vector<T> ALLITEMS
 	
 	tvIFCDOOR IFCDOORS;
 	tvIFCRELDEFINESBYTYPE IFCRELDEFINESBYTYPES;
@@ -169,6 +177,17 @@ struct IFCDOORRELOBJECTS
 	void ReadIfcMaterials(std::string temp);
 
 	void ReadRelDefByTypes(std::string temp);
+	void Reset()
+	{
+		IFCDOORS = {};
+		IFCRELDEFINESBYTYPES = {};
+		IFCDOORSTYLES = {};
+		IFCRELASSOCIATESMATERIAL = {};
+		IFCMATERIALLIST = {};
+		IFCMATERIALS = {};
+		IFCDOORCOM = {};
+		IFCDOORSTOLIST = {};
+	}
 };
 
 

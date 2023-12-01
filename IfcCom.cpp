@@ -30,7 +30,7 @@ void CreateIfcDoorCom(IFCDOORRELOBJECTS* IFCS)
 void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS)
 {
     IFCDOORSTOLISTW IFCdoorToList;
-
+    /*
     for (int i = 0; i < IFCS->IFCRELDEFINESBYTYPES.size(); i++)
     {
         IFCRELDEFINESBYTYPE iRDT = (IFCS->IFCRELDEFINESBYTYPES)[i];
@@ -58,6 +58,37 @@ void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS)
             IFCS->IFCDOORSTOLIST.push_back(IFCdoorToList);
         }
     }
+    */
+    
+    for (int i = 0; i < IFCS->IFCDOORS.size(); i++)
+    {
+        
+        IFCDOOR ifd = (IFCS->IFCDOORS)[i];
+
+            std::string c1 = ifd.shpDoorstyle != -1 ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p03Name : "-";
+            IFCdoorToList.ws_p00_IFCDOORSTYLEName = std::wstring(c1.begin(), c1.end());
+
+            c1 = "-";
+            IFCdoorToList.ws_p01_IFCDOORSTYLENum = std::wstring(c1.begin(), c1.end());
+
+            c1 = ifd.p03Name;
+            IFCdoorToList.ws_p02_IFCDOORName = std::wstring(c1.begin(), c1.end());
+
+            c1 = std::to_string(ifd.p09OverallHeight).substr(0, std::to_string(ifd.p09OverallHeight).size() - 7);
+            IFCdoorToList.ws_p03_IFCDOORHeight = std::wstring(c1.begin(), c1.end());
+
+            c1 = std::to_string(ifd.p10OverallWidth).substr(0, std::to_string(ifd.p10OverallWidth).size() - 7);
+            IFCdoorToList.ws_p04_IFCDOORWidth = std::wstring(c1.begin(), c1.end());
+
+            c1 = ifd.shpDoorstyle != -1 ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p09IfcDoorStyleOperationEnum : "NOTDEFINED";
+            IFCdoorToList.ws_p05_IfcDoorStyleOperationEnum = std::wstring(c1.begin(), c1.end());
+
+
+            IFCS->IFCDOORSTOLIST.push_back(IFCdoorToList);
+        
+    }
+    
+
 
 
 }

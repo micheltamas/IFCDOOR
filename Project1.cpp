@@ -30,6 +30,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 OPENFILENAMEW ofn;
 HWND mTable;
 IFCDOORRELOBJECTS IFCS;
+const int ColNumbers = 7;
 
 wchar_t szFile[1000]; // buffer for file name
 
@@ -175,11 +176,10 @@ HWND CreateListView(HWND hwndParent)
 static void _LvUpdate_New(HWND hWnd, HWND mTable, IFCDOORRELOBJECTS * IFCS)
 {
     ListView_DeleteAllItems(mTable);
-    //tvIFCDOOR* iDoors = &IFCS->IFCDOORS;
     tvIFCDOORSTOLISTW* iDoors = &IFCS->IFCDOORSTOLIST;
 
     std::string sTitle = "Number of IFCDOOR objects = " + std::to_string(IFCS->IFCDOORS.size());
-    std::wstring szTitle = std::wstring(sTitle.begin(), sTitle.end());
+    TONEWWSTR(szTitle, sTitle);
 
     for (int i = 0; i < iDoors->size(); i++)
     {
@@ -187,12 +187,20 @@ static void _LvUpdate_New(HWND hWnd, HWND mTable, IFCDOORRELOBJECTS * IFCS)
         int Pos = 0;
         LVITEM lvi;
  
+      
         lvi.mask = LVIF_TEXT;
-        lvi.pszText = const_cast<LPWSTR>(iDoor.ws_p00_IFCDOORSTYLEName.c_str());
+        WSTR wNR= std::to_wstring(i + 1);
+        lvi.pszText = const_cast<LPWSTR>(wNR.c_str());
         lvi.iItem = SendMessage(mTable, LVM_GETITEMCOUNT, 0, 0);
         lvi.iSubItem = Pos++;
         int index = SendMessage(mTable, LVM_INSERTITEM, 0, (LPARAM)&lvi);
 
+        lvi.mask = LVIF_TEXT;
+        lvi.pszText = const_cast<LPWSTR>(iDoor.ws_p00_IFCDOORSTYLEName.c_str());
+        lvi.iItem = index;
+        lvi.iSubItem = Pos++;
+        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
+        
         lvi.mask = LVIF_TEXT;
         lvi.pszText = const_cast<LPWSTR>(iDoor.ws_p01_IFCDOORSTYLENum.c_str());
         lvi.iItem = index;
@@ -226,118 +234,6 @@ static void _LvUpdate_New(HWND hWnd, HWND mTable, IFCDOORRELOBJECTS * IFCS)
     SetWindowText(hWnd, szTitle.c_str());
     UpdateWindow(mTable);
     ShowWindow(mTable, 1);
-    //Test megj XXX
-}
-
-static void _LvUpdate(HWND hWnd, HWND mTable, tvIFCDOOR * iDoors)
-{
-    ListView_DeleteAllItems(mTable);
-
-    std::string sTitle = "Number of IFCDOOR objects = " + std::to_string(iDoors->size());
-    std::wstring szTitle = std::wstring(sTitle.begin(), sTitle.end());
-
-    for (int i = 0; i < iDoors->size(); i++)
-    {
-        IFCDOOR iDoor = (*iDoors)[i];
-        int Pos = 0;
-        LVITEM lvi;
-
-        lvi.mask = LVIF_TEXT;
-        std::string c1 = iDoor.p00IfcId;
-        std::wstring wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = SendMessage(mTable, LVM_GETITEMCOUNT, 0, 0);
-        lvi.iSubItem = Pos++;
-        int index = SendMessage(mTable, LVM_INSERTITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p01GlobalId;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p02OwnerHistory;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p03Name;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p04Description;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p05ObjectType;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p06ObjectPlacement;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p07Representation;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = iDoor.p08Tag;
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = std::to_string(iDoor.p09OverallHeight).substr(0, std::to_string(iDoor.p09OverallHeight).size() - 7);
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-        lvi.mask = LVIF_TEXT;
-        c1 = std::to_string(iDoor.p10OverallWidth).substr(0, std::to_string(iDoor.p10OverallWidth).size() - 7);
-
-        wc1 = std::wstring(c1.begin(), c1.end());
-        lvi.pszText = const_cast<LPWSTR>(wc1.c_str());
-        lvi.iItem = index;
-        lvi.iSubItem = Pos++;
-        SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
-
-    }
-
-    SetWindowText(hWnd, szTitle.c_str());
-
-    UpdateWindow(mTable);
-    ShowWindow(mTable, 1);
 }
 
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -348,25 +244,25 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     case WM_CREATE:
         {
         
-        mTable = CreateListView(hWnd);
+            mTable = CreateListView(hWnd);
 
-        LV_COLUMN   lvColumn;
-        TCHAR       szString[6][30] = { TEXT("IFCDOORSTYLE NAME"),TEXT("IFCDOORSTYLE NUM"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
-        int Wdth[11] = { 220,80,250,80,80,150};
-        ListView_DeleteAllItems(mTable);
+            LV_COLUMN   lvColumn;
+            
+            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NAME"),TEXT("IFCDOORSTYLE NUM"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
+            int Wdth[11] = { 40,220,80,250,80,80,150};
+            ListView_DeleteAllItems(mTable);
 
-        lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
-        lvColumn.fmt = LVCFMT_LEFT;
-        lvColumn.cx = 120;
+            lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
+            lvColumn.fmt = LVCFMT_LEFT;
+            lvColumn.cx = 120;
 
-        for (int i = 0; i < 6; i++)
-        {
-            lvColumn.pszText = szString[i];
-            lvColumn.cx = Wdth[i];
-            lvColumn.fmt = i > 7 ? LVCFMT_RIGHT : LVCFMT_LEFT;
-            ListView_InsertColumn(mTable, i, &lvColumn);
-        }
-
+            for (int i = 0; i < ColNumbers; i++)
+            {
+                lvColumn.pszText = szString[i];
+                lvColumn.cx = Wdth[i];
+                lvColumn.fmt = i > ColNumbers+  1 ? LVCFMT_RIGHT : LVCFMT_LEFT;
+                ListView_InsertColumn(mTable, i, &lvColumn);
+            }
 
         }
         break;
@@ -423,33 +319,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
-            
-            
-
-            //int AB;
-            //AB = ReadFromIFC(21);
             PAINTSTRUCT ps;
-            
             HDC hdc = BeginPaint(hWnd, &ps);
-            // TODO: Add any drawing code that uses hdc here...
-            //Rectangle(hdc, 50, 50, 200, 100);
-            
-            
-            //std::wstring str = Cstr("Hali, csoki!");
-            //LPCWSTR Wstr = str.c_str();
-            //LPCWSTR Wstr = Cstr(L"Hali, csoki!");
-
-            //int c = Wstr.length();
-            //int c = 20;
-            //TextOut(hdc, 55, 55, Wstr, c);
-
-            SIZE sWsize;
-            GetViewportExtEx(hdc, &sWsize);
-            POINT pWorig;
-            GetViewportOrgEx(hdc, &pWorig);
-            
-            
-
             EndPaint(hWnd, &ps);
         }
         break;

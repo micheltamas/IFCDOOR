@@ -137,12 +137,13 @@ void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
 	std::string ifcFile = std::string(ws.begin(), ws.end());
 
 	std::ifstream stData;
-	stData.open(ifcFile);
+	stData.open(ifcFile);  //stData contains the whole IFC file at this time
 	std::string temp;
 
 	if (!stData.is_open())
 		temp = "Nincs nyitva";
 
+	// Parsing
 	while (stData)
 	{
 		std::getline(stData, temp, '\n');

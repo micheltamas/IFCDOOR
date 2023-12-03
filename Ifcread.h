@@ -10,6 +10,13 @@
 #include <list>
 #include <array>
 
+#define WSTR std::wstring
+#define CWSTR const std::wstring
+#define RETWSTR(_str) \
+	std::wstring(_str.begin(), _str.end())
+#define TONEWWSTR(_New_wstr,_str_to_conv) \
+	std::wstring _New_wstr = std::wstring(_str_to_conv.begin(), _str_to_conv.end())
+
 void PurgeSpaces(std::string* str);
 void ParseSingleProp(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnum(std::string* sTemp, std::string* to_store);

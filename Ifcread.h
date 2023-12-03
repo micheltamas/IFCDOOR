@@ -19,7 +19,7 @@
 #define STARTREADIFCOBJ(_IFCTYPE) \
 	_IFCTYPE IFCTYPE; \
 	std::string temp2; \
-	std::string sTemp = StartIfcRead<_IFCTYPE>(&IFCTYPE, temp)
+	std::string sTemp = StartIfcReadAddIfcID<_IFCTYPE>(&IFCTYPE, temp)
 #define ENDREADIFCOBJ(_IFCCOLLECTOR) \
 	_IFCCOLLECTOR.push_back(IFCTYPE)
 
@@ -29,15 +29,12 @@ void ParseSingleProp(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnum(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnd(std::string* sTemp, std::string* to_store);
 void ParseMultiPropBrace(std::string* sTemp, std::vector<std::string>* to_store);
-template <typename T> std::string StartIfcRead(T* IFCType, std::string temp)
+template <typename T> std::string StartIfcReadAddIfcID(T* IFCType, std::string temp)
 {
-
 	int iBeg = temp.find(IFCType->ParseID) + (IFCType->ParseID).size();
-
 	std::stringstream pString0(temp);
 	std::getline(pString0, IFCType->p00IfcId, '=');
 	PurgeSpaces(&IFCType->p00IfcId);
-
 	return temp.substr(iBeg);
 }
 
@@ -47,22 +44,6 @@ struct IFCCOMMON
 		std::string p00IfcId;
 };
 
-
-struct IFCDOORCOMW :IFCCOMMON
-{
-	std::wstring ws_p00_IfcId;
-	std::wstring ws_p01_GlobalId;
-	std::wstring ws_p02_IFCDOORName;
-	std::wstring ws_p03_IFCDOORHeight;
-	std::wstring ws_p04_IFCDOORWidth;
-	std::wstring ws_p05_MATERIALMaterials;
-	std::wstring ws_p06_IfcDoorStyleOperationEnum;
-	std::wstring ws_p07_IfcDoorStyleConstructionEnum;
-};
-
-
-
-using tvIFCDOORCOMW = std::list<IFCDOORCOMW>;
 
 struct IFCDOORSTOLISTW
 {
@@ -75,7 +56,6 @@ struct IFCDOORSTOLISTW
 	std::wstring ws_p06_IfcDoorStyleConstructionEnum;
 	std::wstring ws_p07_MATERIALMaterials;
 };
-
 using tvIFCDOORSTOLISTW = std::vector<IFCDOORSTOLISTW>;
 
 typedef struct IFCDOORSTYLE :IFCCOMMON
@@ -91,9 +71,7 @@ typedef struct IFCDOORSTYLE :IFCCOMMON
 	std::string  p08Tag;
 	std::string p09IfcDoorStyleOperationEnum;
 	std::string p10IfcDoorStyleConstructionEnum;
-
 };
-
 using tvIFCDOORSTYLE = std::vector<IFCDOORSTYLE>;
 
 typedef struct IFCDOOR :IFCCOMMON
@@ -110,12 +88,8 @@ typedef struct IFCDOOR :IFCCOMMON
 		double p09OverallHeight;
 		double p10OverallWidth;
 		int shpDoorstyle = -1;
-
 };
-
 using tvIFCDOOR = std::vector<IFCDOOR>;
-
-
 
 typedef struct IFCRELDEFINESBYTYPE :IFCCOMMON
 {
@@ -127,7 +101,6 @@ typedef struct IFCRELDEFINESBYTYPE :IFCCOMMON
 	std::vector<int> p05RelatedIFCDOORS;
 	int p06RelatingIFCDOORSTYLE;
 };
-
 using tvIFCRELDEFINESBYTYPE = std::vector<IFCRELDEFINESBYTYPE>;
 
 typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
@@ -140,7 +113,6 @@ typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 	std::vector<std::string> p05RelatedObjects;
 	int p06RelatingType;
 };
-
 using tvIFCRELASSOCIATESMATERIAL = std::vector<IFCRELASSOCIATESMATERIAL>;
 
 typedef struct IFCMATERIAL :IFCCOMMON
@@ -148,7 +120,6 @@ typedef struct IFCMATERIAL :IFCCOMMON
 	std::string ParseID = "IFCMATERIAL(";
 	std::string p01Material;
 };
-
 using tvIFCMATERIAL = std::vector<IFCMATERIAL>;
 
 typedef struct IFCMATERIALLIST :IFCCOMMON
@@ -156,31 +127,17 @@ typedef struct IFCMATERIALLIST :IFCCOMMON
 	std::string ParseID = "IFCMATERIALLIST(";
 	std::vector<std::string> p01RelatedObjects;
 };
-
 using tvIFCMATERIALLIST = std::vector<IFCMATERIALLIST>;
 
-enum IFCDOORRELOBJECTS_ENUM
-{
-	e_IFCDOORS = 0,
-	e_IFCRELDEFINESBYTYPES,
-	e_IFCDOORSTYLES,
-	e_IFCRELASSOCIATESMATERIAL,
-	e_IFCMATERIALLIST,
-	e_IFCMATERIALS,
-	e_IFCDOORCOM,
-	e_IFCDOORSTOLIST,
-};
 
 struct IFCDOORRELOBJECTS
 {
-	
 	tvIFCDOOR IFCDOORS;
 	tvIFCRELDEFINESBYTYPE IFCRELDEFINESBYTYPES;
 	tvIFCDOORSTYLE IFCDOORSTYLES;
 	tvIFCRELASSOCIATESMATERIAL IFCRELASSOCIATESMATERIALS;
 	tvIFCMATERIALLIST IFCMATERIALLISTS;
 	tvIFCMATERIAL IFCMATERIALS;
-	tvIFCDOORCOMW IFCDOORCOM;
 	tvIFCDOORSTOLISTW IFCDOORSTOLIST;
 
 
@@ -198,7 +155,6 @@ struct IFCDOORRELOBJECTS
 		IFCRELASSOCIATESMATERIALS = {};
 		IFCMATERIALLISTS = {};
 		IFCMATERIALS = {};
-		IFCDOORCOM = {};
 		IFCDOORSTOLIST = {};
 	}
 };
@@ -206,5 +162,4 @@ struct IFCDOORRELOBJECTS
 
 
 void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS);
-void CreateIfcDoorCom(IFCDOORRELOBJECTS * IFCS);
 void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS);

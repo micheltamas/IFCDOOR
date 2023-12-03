@@ -1,19 +1,6 @@
 #include "Ifcread.h"
 
 
-template <typename T>
-static std::string _StartIfcRead(T * IFCType, std::string temp)
-{
-
-	int iBeg = temp.find(IFCType->ParseID) + (IFCType->ParseID).size();
-
-	std::stringstream pString0(temp);
-	std::getline(pString0, IFCType->p00IfcId, '=');
-	PurgeSpaces(&IFCType->p00IfcId);
-
-	return temp.substr(iBeg);
-}
-
 void IFCDOORRELOBJECTS::ReadIfcDoors(std::string temp)
 {
 	STARTREADIFCOBJ(IFCDOOR);
@@ -54,8 +41,6 @@ void IFCDOORRELOBJECTS::ReadIfcDoorStyles(std::string temp)
 
 	ENDREADIFCOBJ(IFCDOORSTYLES);
 }
-
-
 
 void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 {

@@ -22,7 +22,7 @@
 	std::string sTemp = StartIfcReadAddIfcID<_IFCTYPE>(&IFCTYPE, temp)
 #define ENDREADIFCOBJ(_IFCCOLLECTOR) \
 	_IFCCOLLECTOR.push_back(IFCTYPE)
-
+#define RELUNDEFINED -1
 
 void PurgeSpaces(std::string* str);
 void ParseSingleProp(std::string* sTemp, std::string* to_store);
@@ -87,8 +87,8 @@ typedef struct IFCDOOR :IFCCOMMON
 		std::string p08Tag;
 		double p09OverallHeight;
 		double p10OverallWidth;
-		int shpDoorstyle = -1;
-		int shpMateriallist = -1;
+		int shpDoorstyle = RELUNDEFINED;
+		int shpMateriallist = RELUNDEFINED;
 };
 using tvIFCDOOR = std::vector<IFCDOOR>;
 
@@ -99,8 +99,12 @@ typedef struct IFCRELDEFINESBYTYPE :IFCCOMMON
 	std::string p02OwnerHistory;
 	std::string p03Name;
 	std::string p04Description;
-	std::vector<int> p05RelatedObjects;
-	int p06RelatingType;
+
+	std::vector<std::string> p05RelatedObjects;
+	std::vector<int> p05RelatedDoors;
+
+	std::string p06RelatingType_str;
+	int p06RelatingType = RELUNDEFINED;
 };
 using tvIFCRELDEFINESBYTYPE = std::vector<IFCRELDEFINESBYTYPE>;
 
@@ -112,8 +116,11 @@ typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 	std::string p03Name;
 	std::string p04Description;
 
-	std::vector<int> p05RelatedObjects;
-	int p06RelatingType;
+	std::vector<std::string> p05RelatedObjects;
+	std::vector<int> p05RelatedDoors;
+
+	std::string p06RelatingType_str;
+	int p06RelatingType = RELUNDEFINED;
 };
 using tvIFCRELASSOCIATESMATERIAL = std::vector<IFCRELASSOCIATESMATERIAL>;
 
@@ -153,7 +160,10 @@ struct IFCDOORRELOBJECTS
 	void ReadIfcMaterials(std::string temp);
 
 	void ReadRelDefByTypes(std::string temp);
+	void ReadRelDefByTypesAfterRead();
+
 	void ReadRelAssociatesMaterials(std::string temp);
+	void ReadRelAssociatesMaterialsAfterRead();
 
 	void Reset()
 	{

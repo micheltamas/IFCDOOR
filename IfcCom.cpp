@@ -10,7 +10,7 @@ void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS)
         
         IFCDOOR ifd = (IFCS->IFCDOORS)[i];
 
-            std::string c1 = ifd.shpDoorstyle != -1 ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p03Name : "-";
+            std::string c1 = ifd.shpDoorstyle != RELUNDEFINED ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p03Name : "NOTDEFINED";
             IFCdoorToList.ws_p00_IFCDOORSTYLEName = RETWSTR(c1);
 
             c1 = "-";
@@ -25,10 +25,10 @@ void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS)
             c1 = std::to_string(ifd.p10OverallWidth).substr(0, std::to_string(ifd.p10OverallWidth).size() - 7);
             IFCdoorToList.ws_p04_IFCDOORWidth = RETWSTR(c1);
 
-            c1 = ifd.shpDoorstyle != -1 ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p09IfcDoorStyleOperationEnum : "NOTDEFINED";
+            c1 = ifd.shpDoorstyle != RELUNDEFINED ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p09IfcDoorStyleOperationEnum : "NOTDEFINED";
             IFCdoorToList.ws_p05_IfcDoorStyleOperationEnum = RETWSTR(c1);
 
-            if (ifd.shpMateriallist != -1)
+            if (ifd.shpMateriallist != RELUNDEFINED)
             {
                 c1 = "(";
                 std::vector<int> vM = IFCS->IFCMATERIALLISTS[ifd.shpMateriallist].p01RelatedObjects;

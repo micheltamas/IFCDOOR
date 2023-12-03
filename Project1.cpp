@@ -249,7 +249,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             LV_COLUMN   lvColumn;
             
-            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NAME"),TEXT("IFCDOORSTYLE MATERIALS"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
+            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NAME"),TEXT("MATERIAL LIST"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
             int Wdth[11] = { 40,220,250,250,80,80,150};
             ListView_DeleteAllItems(mTable);
 

@@ -165,6 +165,13 @@ struct IFCDOORRELOBJECTS
 	void ReadRelAssociatesMaterials(std::string temp);
 	void ReadRelAssociatesMaterialsAfterRead();
 
+
+	void AfterRead()
+	{
+		ReadRelDefByTypesAfterRead();
+		ReadRelAssociatesMaterialsAfterRead();
+	}
+
 	void Reset()
 	{
 		IFCDOORS = {};

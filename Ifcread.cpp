@@ -23,6 +23,8 @@ void IFCDOORRELOBJECTS::ReadIfcDoors(std::string temp)
 	ENDREADIFCOBJ(IFCDOORS);
 }
 
+//Doorstyles
+
 void IFCDOORRELOBJECTS::ReadIfcDoorStyles(std::string temp)
 {
 	STARTREADIFCOBJ(IFCDOORSTYLE);
@@ -55,7 +57,6 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 
 	ENDREADIFCOBJ(IFCRELDEFINESBYTYPES);
 }
-
 
 void IFCDOORRELOBJECTS::ReadRelDefByTypesAfterRead()
 {
@@ -97,6 +98,8 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypesAfterRead()
 	}
 }
 
+//Material
+
 void IFCDOORRELOBJECTS::ReadIfcMaterials(std::string temp)
 {
 	STARTREADIFCOBJ(IFCMATERIAL);
@@ -127,7 +130,6 @@ void IFCDOORRELOBJECTS::ReadIfcMateriallists(std::string temp)
 	
 	ENDREADIFCOBJ(IFCMATERIALLISTS);
 }
-
 
 void IFCDOORRELOBJECTS::ReadRelAssociatesMaterials(std::string temp)
 {
@@ -182,6 +184,8 @@ void IFCDOORRELOBJECTS::ReadRelAssociatesMaterialsAfterRead()
 
 
 
+// Main read function
+
 void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
 {
 	
@@ -222,11 +226,9 @@ void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
 	}
 	
 	//after reading IFC file
-	IFCS->ReadRelDefByTypesAfterRead();
-	IFCS->ReadRelAssociatesMaterialsAfterRead();
-
+	IFCS->AfterRead();
 	
-	//CreateIfcDoorCom(IFCS);
+	//Create list to show in Dialog Window
 	CreateIfcDoorsToList(IFCS);
 
 	stData.close();

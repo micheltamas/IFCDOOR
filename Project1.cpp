@@ -180,6 +180,7 @@ static void _LvUpdate_New(HWND hWnd, HWND mTable, IFCDOORRELOBJECTS * IFCS)
 
     std::string sTitle = "Number of IFCDOOR objects = " + std::to_string(IFCS->IFCDOORS.size());
     TONEWWSTR(szTitle, sTitle);
+    szTitle = szTitle + L"; Filename= " + IFCS->FileName;
 
     for (int i = 0; i < iDoors->size(); i++)
     {
@@ -202,7 +203,7 @@ static void _LvUpdate_New(HWND hWnd, HWND mTable, IFCDOORRELOBJECTS * IFCS)
         SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
         
         lvi.mask = LVIF_TEXT;
-        lvi.pszText = const_cast<LPWSTR>(iDoor.ws_p01_IFCDOORSTYLENum.c_str());
+        lvi.pszText = const_cast<LPWSTR>(iDoor.ws_p07_MATERIALMaterials.c_str());
         lvi.iItem = index;
         lvi.iSubItem = Pos++;
         SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
@@ -248,8 +249,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             LV_COLUMN   lvColumn;
             
-            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NAME"),TEXT("IFCDOORSTYLE NUM"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
-            int Wdth[11] = { 40,220,80,250,80,80,150};
+            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NAME"),TEXT("IFCDOORSTYLE MATERIALS"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
+            int Wdth[11] = { 40,220,250,250,80,80,150};
             ListView_DeleteAllItems(mTable);
 
             lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;

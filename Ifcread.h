@@ -88,6 +88,7 @@ typedef struct IFCDOOR :IFCCOMMON
 		double p09OverallHeight;
 		double p10OverallWidth;
 		int shpDoorstyle = -1;
+		int shpMateriallist = -1;
 };
 using tvIFCDOOR = std::vector<IFCDOOR>;
 
@@ -98,8 +99,8 @@ typedef struct IFCRELDEFINESBYTYPE :IFCCOMMON
 	std::string p02OwnerHistory;
 	std::string p03Name;
 	std::string p04Description;
-	std::vector<int> p05RelatedIFCDOORS;
-	int p06RelatingIFCDOORSTYLE;
+	std::vector<int> p05RelatedObjects;
+	int p06RelatingType;
 };
 using tvIFCRELDEFINESBYTYPE = std::vector<IFCRELDEFINESBYTYPE>;
 
@@ -110,7 +111,8 @@ typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 	std::string p02OwnerHistory;
 	std::string p03Name;
 	std::string p04Description;
-	std::vector<std::string> p05RelatedObjects;
+
+	std::vector<int> p05RelatedObjects;
 	int p06RelatingType;
 };
 using tvIFCRELASSOCIATESMATERIAL = std::vector<IFCRELASSOCIATESMATERIAL>;
@@ -125,13 +127,17 @@ using tvIFCMATERIAL = std::vector<IFCMATERIAL>;
 typedef struct IFCMATERIALLIST :IFCCOMMON
 {
 	std::string ParseID = "IFCMATERIALLIST(";
-	std::vector<std::string> p01RelatedObjects;
+	std::vector<int> p01RelatedObjects;
+
+	std::string sMateriallist;
 };
 using tvIFCMATERIALLIST = std::vector<IFCMATERIALLIST>;
 
 
 struct IFCDOORRELOBJECTS
 {
+	WSTR FileName;
+	
 	tvIFCDOOR IFCDOORS;
 	tvIFCRELDEFINESBYTYPE IFCRELDEFINESBYTYPES;
 	tvIFCDOORSTYLE IFCDOORSTYLES;
@@ -147,6 +153,8 @@ struct IFCDOORRELOBJECTS
 	void ReadIfcMaterials(std::string temp);
 
 	void ReadRelDefByTypes(std::string temp);
+	void ReadRelAssociatesMaterials(std::string temp);
+
 	void Reset()
 	{
 		IFCDOORS = {};

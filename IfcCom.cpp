@@ -28,6 +28,19 @@ void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS)
             c1 = ifd.shpDoorstyle != -1 ? (IFCS->IFCDOORSTYLES)[ifd.shpDoorstyle].p09IfcDoorStyleOperationEnum : "NOTDEFINED";
             IFCdoorToList.ws_p05_IfcDoorStyleOperationEnum = RETWSTR(c1);
 
+            if (ifd.shpMateriallist != -1)
+            {
+                c1 = "(";
+                std::vector<int> vM = IFCS->IFCMATERIALLISTS[ifd.shpMateriallist].p01RelatedObjects;
+                for (int i = 0; i < vM.size() ;i++)
+                {
+                    c1 = i < vM.size()-1 ? c1 + IFCS->IFCMATERIALS[vM[i]].p01Material + "; " : c1 + IFCS->IFCMATERIALS[vM[i]].p01Material + ")";
+                }
+            }
+            else
+                c1 = "NOTDEFINED";
+            IFCdoorToList.ws_p07_MATERIALMaterials = RETWSTR(c1);
+
 
             IFCS->IFCDOORSTOLIST.push_back(IFCdoorToList);
         

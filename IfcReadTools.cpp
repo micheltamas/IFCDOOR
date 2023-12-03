@@ -1,6 +1,7 @@
 #include "Ifcread.h"
 
 
+
 void PurgeSpaces(std::string * str)
 {
 str->erase(std::remove_if(str->begin(), str->end(), isspace), str->end());

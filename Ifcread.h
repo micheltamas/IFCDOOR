@@ -16,23 +16,27 @@
 	std::wstring(_str.begin(), _str.end())
 #define TONEWWSTR(_New_wstr,_str_to_conv) \
 	std::wstring _New_wstr = std::wstring(_str_to_conv.begin(), _str_to_conv.end())
+#define STARTREADIFCOBJ(_IFCTYPE) \
+	_IFCTYPE IFCTYPE; \
+	std::string temp2; \
+	std::string sTemp = StartIfcRead<_IFCTYPE>(&IFCTYPE, temp)
+
 
 void PurgeSpaces(std::string* str);
 void ParseSingleProp(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnum(std::string* sTemp, std::string* to_store);
 void ParseSinglePropEnd(std::string* sTemp, std::string* to_store);
 void ParseMultiPropBrace(std::string* sTemp, std::vector<std::string>* to_store);
-
-template <typename T>
-T getList(std::list<T> _list, int _i) 
+template <typename T> std::string StartIfcRead(T* IFCType, std::string temp)
 {
-	std::list<T>::template iterator it = _list.begin();
-	
-	for (int i = 0; i < _i; i++) 
-	{
-	++it;
-	}
-	return *it;
+
+	int iBeg = temp.find(IFCType->ParseID) + (IFCType->ParseID).size();
+
+	std::stringstream pString0(temp);
+	std::getline(pString0, IFCType->p00IfcId, '=');
+	PurgeSpaces(&IFCType->p00IfcId);
+
+	return temp.substr(iBeg);
 }
 
 struct IFCCOMMON
@@ -72,8 +76,9 @@ struct IFCDOORSTOLISTW
 
 using tvIFCDOORSTOLISTW = std::vector<IFCDOORSTOLISTW>;
 
-struct IFCDOORSTYLE :IFCCOMMON
+typedef struct IFCDOORSTYLE :IFCCOMMON
 {
+	std::string ParseID = "IFCDOORSTYLE(";
 	std::string p01GlobalId;
 	std::string p02OwnerHistory;
 	std::string p03Name;	
@@ -89,8 +94,9 @@ struct IFCDOORSTYLE :IFCCOMMON
 
 using tvIFCDOORSTYLE = std::vector<IFCDOORSTYLE>;
 
-struct IFCDOOR :IFCCOMMON
+typedef struct IFCDOOR :IFCCOMMON
 {
+		std::string ParseID = "IFCDOOR(";
 		std::string p01GlobalId;
 		std::string p02OwnerHistory;
 		std::string p03Name;
@@ -109,8 +115,9 @@ using tvIFCDOOR = std::vector<IFCDOOR>;
 
 
 
-struct IFCRELDEFINESBYTYPE :IFCCOMMON
+typedef struct IFCRELDEFINESBYTYPE :IFCCOMMON
 {
+	std::string ParseID = "IFCRELDEFINESBYTYPE(";
 	std::string p01GlobalId;
 	std::string p02OwnerHistory;
 	std::string p03Name;
@@ -121,8 +128,9 @@ struct IFCRELDEFINESBYTYPE :IFCCOMMON
 
 using tvIFCRELDEFINESBYTYPE = std::vector<IFCRELDEFINESBYTYPE>;
 
-struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
+typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 {
+	std::string ParseID = "IFCRELASSOCIATESMATERIAL(";
 	std::string p01GlobalId;
 	std::string p02OwnerHistory;
 	std::string p03Name;
@@ -133,15 +141,17 @@ struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 
 using tvIFCRELASSOCIATESMATERIAL = std::vector<IFCRELASSOCIATESMATERIAL>;
 
-struct IFCMATERIAL :IFCCOMMON
+typedef struct IFCMATERIAL :IFCCOMMON
 {
+	std::string ParseID = "IFCMATERIAL(";
 	std::string p01Material;
 };
 
 using tvIFCMATERIAL = std::vector<IFCMATERIAL>;
 
-struct IFCMATERIALLIST :IFCCOMMON
+typedef struct IFCMATERIALLIST :IFCCOMMON
 {
+	std::string ParseID = "IFCMATERIALLIST(";
 	std::vector<std::string> p01RelatedObjects;
 };
 
@@ -171,13 +181,6 @@ struct IFCDOORRELOBJECTS
 	tvIFCDOORCOMW IFCDOORCOM;
 	tvIFCDOORSTOLISTW IFCDOORSTOLIST;
 
-
-	std::string ParseID_IFCDOOR = "IFCDOOR(";
-	std::string ParseID_IFCRELDEFINESBYTYPE = "IFCRELDEFINESBYTYPE(";
-	std::string ParseID_IFCDOORSTYLE = "IFCDOORSTYLE(";
-	std::string ParseID_IFCRELASSOCIATESMATERIAL = "IFCRELASSOCIATESMATERIAL(";
-	std::string ParseID_IFCMATERIALLIST = "IFCMATERIALLIST(";
-	std::string ParseID_IFCMATERIAL = "IFCMATERIAL(";
 
 	void ReadIfcDoorStyles(std::string temp);
 	void ReadIfcDoors(std::string temp);

@@ -1,84 +1,71 @@
 #include "Ifcread.h"
 
 
+template <typename T>
+static std::string _StartIfcRead(T * IFCType, std::string temp)
+{
+
+	int iBeg = temp.find(IFCType->ParseID) + (IFCType->ParseID).size();
+
+	std::stringstream pString0(temp);
+	std::getline(pString0, IFCType->p00IfcId, '=');
+	PurgeSpaces(&IFCType->p00IfcId);
+
+	return temp.substr(iBeg);
+}
 
 void IFCDOORRELOBJECTS::ReadIfcDoors(std::string temp)
 {
+	STARTREADIFCOBJ(IFCDOOR);
 	
-	IFCDOOR iDoor;
-	std::string temp2;
-
-	int iBeg = temp.find(ParseID_IFCDOOR) + (ParseID_IFCDOOR).size();
-
-	std::stringstream pString0(temp);
-	std::getline(pString0, iDoor.p00IfcId, '=');
-	PurgeSpaces(&iDoor.p00IfcId);
-
-	std::string sTemp(temp.substr(iBeg));
-	
-	ParseSingleProp(&sTemp, &iDoor.p01GlobalId);
-	ParseSingleProp(&sTemp, &iDoor.p02OwnerHistory);
-	ParseSingleProp(&sTemp, &iDoor.p03Name);
-	ParseSingleProp(&sTemp, &iDoor.p04Description);
-	ParseSingleProp(&sTemp, &iDoor.p05ObjectType);
-	ParseSingleProp(&sTemp, &iDoor.p06ObjectPlacement);
-	ParseSingleProp(&sTemp, &iDoor.p07Representation);
-	ParseSingleProp(&sTemp, &iDoor.p08Tag);
+	ParseSingleProp(&sTemp, &IFCTYPE.p01GlobalId);
+	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
+	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
+	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
+	ParseSingleProp(&sTemp, &IFCTYPE.p05ObjectType);
+	ParseSingleProp(&sTemp, &IFCTYPE.p06ObjectPlacement);
+	ParseSingleProp(&sTemp, &IFCTYPE.p07Representation);
+	ParseSingleProp(&sTemp, &IFCTYPE.p08Tag);
 	
 	std::stringstream pString(sTemp);
 	std::getline(pString, temp2, ',');
-	iDoor.p09OverallHeight = std::stod(temp2);
+	IFCTYPE.p09OverallHeight = std::stod(temp2);
 	std::getline(pString, temp2, ',');
-	iDoor.p10OverallWidth = std::stod(temp2);
+	IFCTYPE.p10OverallWidth = std::stod(temp2);
 
-	IFCDOORS.push_back(iDoor);
+	IFCDOORS.push_back(IFCTYPE);
 }
 
 
 void IFCDOORRELOBJECTS::ReadIfcDoorStyles(std::string temp)
 {
+	STARTREADIFCOBJ(IFCDOORSTYLE);
 
-	IFCDOORSTYLE iDS;
-	std::string temp2;
-	int iBeg = temp.find(ParseID_IFCDOORSTYLE) + (ParseID_IFCDOORSTYLE).size();
+	ParseSingleProp(&sTemp, &IFCTYPE.p01GlobalId);
+	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
+	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
+	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
+	ParseSingleProp(&sTemp, &IFCTYPE.p05ObjectType);
+	ParseMultiPropBrace(&sTemp, &IFCTYPE.p06props);
+	ParseMultiPropBrace(&sTemp, &IFCTYPE.p07props);
+	ParseSingleProp(&sTemp, &IFCTYPE.p08Tag);
+	ParseSinglePropEnum(&sTemp, &IFCTYPE.p09IfcDoorStyleOperationEnum);
+	ParseSinglePropEnum(&sTemp, &IFCTYPE.p10IfcDoorStyleConstructionEnum);
 
-	std::stringstream pString0(temp);
-	std::getline(pString0, iDS.p00IfcId, '=');
-	PurgeSpaces(&iDS.p00IfcId);
-
-	std::string sTemp(temp.substr(iBeg));
-
-	ParseSingleProp(&sTemp, &iDS.p01GlobalId);
-	ParseSingleProp(&sTemp, &iDS.p02OwnerHistory);
-	ParseSingleProp(&sTemp, &iDS.p03Name);
-	ParseSingleProp(&sTemp, &iDS.p04Description);
-	ParseSingleProp(&sTemp, &iDS.p05ObjectType);
-	ParseMultiPropBrace(&sTemp, &iDS.p06props);
-	ParseMultiPropBrace(&sTemp, &iDS.p07props);
-	ParseSingleProp(&sTemp, &iDS.p08Tag);
-	ParseSinglePropEnum(&sTemp, &iDS.p09IfcDoorStyleOperationEnum);
-	ParseSinglePropEnum(&sTemp, &iDS.p10IfcDoorStyleConstructionEnum);
-
-	IFCDOORSTYLES.push_back(iDS);
+	IFCDOORSTYLES.push_back(IFCTYPE);
 }
+
+
 
 void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 {
 
-	IFCRELDEFINESBYTYPE iRelT;
-	std::string temp2;
-	int iBeg = temp.find(ParseID_IFCRELDEFINESBYTYPE) + (ParseID_IFCRELDEFINESBYTYPE).size();
+	STARTREADIFCOBJ(IFCRELDEFINESBYTYPE);
 
-	std::stringstream pString0(temp);
-	std::getline(pString0, iRelT.p00IfcId, '=');
-	PurgeSpaces(&iRelT.p00IfcId);
-
-	std::string sTemp(temp.substr(iBeg));
-
-	ParseSingleProp(&sTemp, &iRelT.p01GlobalId);
-	ParseSingleProp(&sTemp, &iRelT.p02OwnerHistory);
-	ParseSingleProp(&sTemp, &iRelT.p03Name);
-	ParseSingleProp(&sTemp, &iRelT.p04Description);
+	ParseSingleProp(&sTemp, &IFCTYPE.p01GlobalId);
+	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
+	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
+	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
 
 	std::vector<std::string> to_store;
 	ParseMultiPropBrace(&sTemp, &to_store);
@@ -91,7 +78,7 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 
 		if (tempDSs == IFCDOORSTYLES[i].p00IfcId)
 		{
-			iRelT.p06RelatingIFCDOORSTYLE = i;
+			IFCTYPE.p06RelatingIFCDOORSTYLE = i;
 
 			for (int k = 0; k < to_store.size(); k++)
 			{
@@ -100,7 +87,7 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 				{
 					if (to_store[k] == IFCDOORS[j].p00IfcId)
 					{
-						iRelT.p05RelatedIFCDOORS.push_back(j);
+						IFCTYPE.p05RelatedIFCDOORS.push_back(j);
 						IFCDOORS[j].shpDoorstyle = i;
 					}
 				}
@@ -108,25 +95,15 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 		}
 	}
 
-	IFCRELDEFINESBYTYPES.push_back(iRelT);
+	IFCRELDEFINESBYTYPES.push_back(IFCTYPE);
 }
 
 void IFCDOORRELOBJECTS::ReadIfcMaterials(std::string temp)
 {
-	IFCMATERIAL iMat;
+	STARTREADIFCOBJ(IFCMATERIAL);
 
-	std::string temp2;
-	int iBeg = temp.find(ParseID_IFCMATERIAL) + (ParseID_IFCMATERIAL).size();
-	
-	std::stringstream pString0(temp);
-	std::getline(pString0, iMat.p00IfcId, '=');
-	PurgeSpaces(&iMat.p00IfcId);
-
-	std::string sTemp(temp.substr(iBeg));
-
-	ParseSinglePropEnd(&sTemp, &iMat.p01Material);
-
-	IFCMATERIALS.push_back(iMat);
+	ParseSinglePropEnd(&sTemp, &IFCTYPE.p01Material);
+	IFCMATERIALS.push_back(IFCTYPE);
 }
 
 void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
@@ -147,15 +124,15 @@ void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
 	while (stData)
 	{
 		std::getline(stData, temp, '\n');
-
-		if (temp.find(IFCS->ParseID_IFCDOOR) != std::string::npos)
+		
+		if (temp.find(IFCDOOR().ParseID) != std::string::npos)
 			IFCS->ReadIfcDoors(temp);
-		if (temp.find(IFCS->ParseID_IFCDOORSTYLE) != std::string::npos)
+		if (temp.find(IFCDOORSTYLE().ParseID) != std::string::npos)
 			IFCS->ReadIfcDoorStyles(temp);
-		if (temp.find(IFCS->ParseID_IFCRELDEFINESBYTYPE) != std::string::npos)
+		if (temp.find(IFCRELDEFINESBYTYPE().ParseID) != std::string::npos)
 			IFCS->ReadRelDefByTypes(temp);
 
-		if (temp.find(IFCS->ParseID_IFCMATERIAL) != std::string::npos)
+		if (temp.find(IFCMATERIAL().ParseID) != std::string::npos)
 			IFCS->ReadIfcMaterials(temp);
 
 	}

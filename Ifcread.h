@@ -9,6 +9,7 @@
 #include <Commdlg.h>
 #include <list>
 #include <array>
+#include <map>
 
 #define WSTR std::wstring
 #define CWSTR const std::wstring
@@ -22,7 +23,10 @@
 	std::string sTemp = StartIfcReadAddIfcID<_IFCTYPE>(&IFCTYPE, temp)
 #define ENDREADIFCOBJ(_IFCCOLLECTOR) \
 	_IFCCOLLECTOR.push_back(IFCTYPE)
+#define AFTERREAD(_RAT, _RAV, _RLT, _RLV, _R) \
+	ReadRelAssociatesList<_RAT, _RLT>(&_RAV, &_RLV, _R, &IFCDOORS)
 #define RELUNDEFINED -1
+#define COLLECTORTYPE(_COLLTYPE) _COLLTYPE
 
 void PurgeSpaces(std::string* str);
 void ParseSingleProp(std::string* sTemp, std::string* to_store);
@@ -38,6 +42,16 @@ template <typename T> std::string StartIfcReadAddIfcID(T* IFCType, std::string t
 	return temp.substr(iBeg);
 }
 
+typedef enum RELATIONENUMS
+{
+	r01_Doorstyle,
+	r02_Materiallist,
+	r03_ThermalRes,
+	MAXRELATION
+};
+
+
+//PARENT STRUCT CONATINING IFC FILE IDEINTIFIER FOR EVERY IFC OBJECTS
 struct IFCCOMMON
 {
 	public:
@@ -45,6 +59,7 @@ struct IFCCOMMON
 };
 
 
+//STRUCTURE FOR STORING THE DATA TO BE DISPLAYED
 struct IFCDOORSTOLISTW
 {
 	std::wstring ws_p00_IFCDOORSTYLEName;
@@ -55,9 +70,12 @@ struct IFCDOORSTOLISTW
 	std::wstring ws_p05_IfcDoorStyleOperationEnum;
 	std::wstring ws_p06_IfcDoorStyleConstructionEnum;
 	std::wstring ws_p07_MATERIALMaterials;
+
 };
 using tvIFCDOORSTOLISTW = std::vector<IFCDOORSTOLISTW>;
 
+
+//IFCDOOR AND DOORSTYLE
 typedef struct IFCDOORSTYLE :IFCCOMMON
 {
 	std::string ParseID = "IFCDOORSTYLE(";
@@ -87,8 +105,9 @@ typedef struct IFCDOOR :IFCCOMMON
 		std::string p08Tag;
 		double p09OverallHeight;
 		double p10OverallWidth;
-		int shpDoorstyle = RELUNDEFINED;
-		int shpMateriallist = RELUNDEFINED;
+
+		std::array<int, MAXRELATION> relationsToList{ RELUNDEFINED ,RELUNDEFINED ,RELUNDEFINED };
+
 };
 using tvIFCDOOR = std::vector<IFCDOOR>;
 
@@ -100,14 +119,16 @@ typedef struct IFCRELDEFINESBYTYPE :IFCCOMMON
 	std::string p03Name;
 	std::string p04Description;
 
-	std::vector<std::string> p05RelatedObjects;
-	std::vector<int> p05RelatedDoors;
+	std::vector<std::string> p05RelatedObjects_str;
+	std::vector<int> p05RelatedObjects;
 
-	std::string p06RelatingType_str;
-	int p06RelatingType = RELUNDEFINED;
+	std::string p06RelatingObject_str;
+	int p06RelatingObject = RELUNDEFINED;
 };
 using tvIFCRELDEFINESBYTYPE = std::vector<IFCRELDEFINESBYTYPE>;
 
+
+//MATERIALS
 typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 {
 	std::string ParseID = "IFCRELASSOCIATESMATERIAL(";
@@ -116,11 +137,11 @@ typedef struct IFCRELASSOCIATESMATERIAL :IFCCOMMON
 	std::string p03Name;
 	std::string p04Description;
 
-	std::vector<std::string> p05RelatedObjects;
-	std::vector<int> p05RelatedDoors;
+	std::vector<std::string> p05RelatedObjects_str;
+	std::vector<int> p05RelatedObjects;
 
-	std::string p06RelatingType_str;
-	int p06RelatingType = RELUNDEFINED;
+	std::string p06RelatingObject_str;
+	int p06RelatingObject = RELUNDEFINED;
 };
 using tvIFCRELASSOCIATESMATERIAL = std::vector<IFCRELASSOCIATESMATERIAL>;
 
@@ -141,35 +162,129 @@ typedef struct IFCMATERIALLIST :IFCCOMMON
 using tvIFCMATERIALLIST = std::vector<IFCMATERIALLIST>;
 
 
+//PROPERTIES
+typedef struct IFCRELDEFINESBYPROPERTIES : IFCCOMMON
+{
+	std::string ParseID = "IFCRELDEFINESBYPROPERTIES(";
+	std::string p01GlobalId;
+	std::string p02OwnerHistory;
+	std::string p03Name;
+	std::string p04Description;
+
+	std::vector<std::string> p05RelatedObjects_str;
+	std::vector<int> p05RelatedObjects;
+
+	std::string p06RelatingObject_str;
+	int p06RelatingObject = RELUNDEFINED;
+};
+using tvIFCRELDEFINESBYPROPERTIES = std::vector<IFCRELDEFINESBYPROPERTIES>;
+
+typedef struct IFCPROPERTYSET :IFCCOMMON
+{
+	std::string ParseID = "IFCPROPERTYSET(";
+	std::string p01GlobalId;
+	std::string p02OwnerHistory;
+	std::string p03Name;
+	std::string p04Description;
+
+	std::vector<std::string> p05RelatedObjects_str;
+	std::vector<int> p05RelatedObjects;
+
+	std::string sThermalTransmittance;
+};
+using tvIFCPROPERTYSET = std::vector<IFCPROPERTYSET>;
+
+typedef struct IFCPROPERTYSINGLEVALUE :IFCCOMMON
+{
+	std::string ParseID = "IFCPROPERTYSINGLEVALUE(";
+	std::string p01propertyname;
+	std::string p02void;
+	std::string p03propertyValue;
+	std::string p04void;
+};
+using tvIFCPROPERTYSINGLEVALUE = std::vector<IFCPROPERTYSINGLEVALUE>;
+
+
+template <typename T, typename U> void ReadRelAssociatesList(T* RA, U* RL, RELATIONENUMS R, tvIFCDOOR* IFCDOORS)
+{
+	for (int n = 0; n < RA->size(); n++)
+	{
+		for (int i = 0; i < RL->size(); i++)
+		{
+			if ((*RA)[n].p06RelatingObject_str == (*RL)[i].p00IfcId)
+			{
+				(*RA)[n].p06RelatingObject = i;
+			}
+		}
+	}
+
+	for (int n = 0; n < RA->size(); n++)
+	{
+		if ((*RA)[n].p06RelatingObject == RELUNDEFINED)
+			continue;
+		for (int i = 0; i < RL->size(); i++)
+		{
+
+			if ((*RL)[(*RA)[n].p06RelatingObject].p00IfcId == (*RL)[i].p00IfcId)
+			{
+				for (int k = 0; k < (*RA)[n].p05RelatedObjects_str.size(); k++)
+				{
+					for (int j = 0; j < IFCDOORS->size(); j++)
+
+					{
+						if ((*RA)[n].p05RelatedObjects_str[k] == (*IFCDOORS)[j].p00IfcId)
+						{
+							(*RA)[n].p05RelatedObjects.push_back(j);
+							(*IFCDOORS)[j].relationsToList[R] = i;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+
 struct IFCDOORRELOBJECTS
 {
 	WSTR FileName;
-	
+	//IFC OBJECTS
 	tvIFCDOOR IFCDOORS;
 	tvIFCRELDEFINESBYTYPE IFCRELDEFINESBYTYPES;
 	tvIFCDOORSTYLE IFCDOORSTYLES;
+
 	tvIFCRELASSOCIATESMATERIAL IFCRELASSOCIATESMATERIALS;
 	tvIFCMATERIALLIST IFCMATERIALLISTS;
 	tvIFCMATERIAL IFCMATERIALS;
+
+	tvIFCRELDEFINESBYPROPERTIES IFCRELDEFINESBYPROPERTIESES;
+	tvIFCPROPERTYSET IFCPROPERTYSETS;
+	tvIFCPROPERTYSINGLEVALUE IFCPROPERTYSINGLEVALUES;
+
+	//FOR UI
 	tvIFCDOORSTOLISTW IFCDOORSTOLIST;
 
 
 	void ReadIfcDoorStyles(std::string temp);
 	void ReadIfcDoors(std::string temp);
+	void ReadRelDefByTypes(std::string temp);
+
 	void ReadIfcMateriallists(std::string temp);
 	void ReadIfcMaterials(std::string temp);
-
-	void ReadRelDefByTypes(std::string temp);
-	void ReadRelDefByTypesAfterRead();
-
 	void ReadRelAssociatesMaterials(std::string temp);
-	void ReadRelAssociatesMaterialsAfterRead();
 
+	void ReadPropertySets(std::string temp);
+	void ReadPropertySingleValues(std::string temp);
+	void ReadRelDefinesByProperties(std::string temp);
 
 	void AfterRead()
 	{
-		ReadRelDefByTypesAfterRead();
-		ReadRelAssociatesMaterialsAfterRead();
+		//ReadRelDefByTypesAfterRead();
+		//ReadRelAssociatesMaterialsAfterRead();
+		//ReadRelAssociatesList<tvIFCRELASSOCIATESMATERIAL, tvIFCMATERIALLIST>(&IFCRELASSOCIATESMATERIALS, &IFCMATERIALLISTS, r02_Materiallist);
+		AFTERREAD(tvIFCRELDEFINESBYTYPE, IFCRELDEFINESBYTYPES, tvIFCDOORSTYLE, IFCDOORSTYLES, r01_Doorstyle);
+		AFTERREAD(tvIFCRELASSOCIATESMATERIAL, IFCRELASSOCIATESMATERIALS, tvIFCMATERIALLIST, IFCMATERIALLISTS, r02_Materiallist);
+		AFTERREAD(tvIFCRELDEFINESBYPROPERTIES, IFCRELDEFINESBYPROPERTIESES, tvIFCPROPERTYSET, IFCPROPERTYSETS, r03_ThermalRes);
 	}
 
 	void Reset()
@@ -181,6 +296,7 @@ struct IFCDOORRELOBJECTS
 		IFCMATERIALLISTS = {};
 		IFCMATERIALS = {};
 		IFCDOORSTOLIST = {};
+		IFCRELDEFINESBYPROPERTIESES = {};
 	}
 };
 
@@ -188,3 +304,5 @@ struct IFCDOORRELOBJECTS
 
 void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS);
 void CreateIfcDoorsToList(IFCDOORRELOBJECTS* IFCS);
+
+

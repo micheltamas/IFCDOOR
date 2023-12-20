@@ -1,9 +1,26 @@
 #include "Ifcread.h"
 
+std::map<std::string, int> PSDC{
+	{"Reference", 0},
+	{"FireRating", 1},
+	{"AcousticRating", 2},
+	{"SecurityRating", 3},
+	{"IsExternal", 4},
+	{"Infiltration", 5},
+	{"ThermalTransmittance", 6},
+	{"GlazingAreaFraction", 7},
+	{"HandicapAccessible", 8},
+	{"FireExit", 9},
+	{"SelfClosing", 10},
+	{"SmokeStop", 11}
+};
+
 
 void IFCDOORRELOBJECTS::ReadIfcDoors(std::string temp)
 {
 	STARTREADIFCOBJ(IFCDOOR);
+	
+	//for (int i = 0 ; i < MAXRELATION; i++) { &IFCTYPE.relationsToList[i] = RELUNDEFINED; }
 	
 	ParseSingleProp(&sTemp, &IFCTYPE.p01GlobalId);
 	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
@@ -52,12 +69,13 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
 	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
 	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
-	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects);
-	ParseSinglePropEnd(&sTemp, &IFCTYPE.p06RelatingType_str);
+	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects_str);
+	ParseSinglePropEnd(&sTemp, &IFCTYPE.p06RelatingObject_str);
 
 	ENDREADIFCOBJ(IFCRELDEFINESBYTYPES);
 }
 
+/*
 void IFCDOORRELOBJECTS::ReadRelDefByTypesAfterRead()
 {
 	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
@@ -97,6 +115,94 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypesAfterRead()
 		}
 	}
 }
+*/
+//Properties
+
+
+void IFCDOORRELOBJECTS::ReadRelDefinesByProperties(std::string temp)
+{
+
+	STARTREADIFCOBJ(IFCRELDEFINESBYPROPERTIES);
+
+	ParseSingleProp(&sTemp, &IFCTYPE.p01GlobalId);
+	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
+	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
+	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
+	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects_str);
+	ParseSinglePropEnd(&sTemp, &IFCTYPE.p06RelatingObject_str);
+
+	ENDREADIFCOBJ(IFCRELDEFINESBYPROPERTIESES);
+}
+
+void IFCDOORRELOBJECTS::ReadPropertySets(std::string temp)
+{
+	STARTREADIFCOBJ(IFCPROPERTYSET);
+
+	ParseSingleProp(&sTemp, &IFCTYPE.p01GlobalId);
+	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
+	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
+	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
+	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects_str);
+
+	ENDREADIFCOBJ(IFCPROPERTYSETS);
+}
+
+void IFCDOORRELOBJECTS::ReadPropertySingleValues(std::string temp)
+{
+	STARTREADIFCOBJ(IFCPROPERTYSINGLEVALUE);
+
+	ParseSingleProp(&sTemp, &IFCTYPE.p01propertyname);
+	ParseSingleProp(&sTemp, &IFCTYPE.p02void);
+	ParseSingleProp(&sTemp, &IFCTYPE.p03propertyValue);
+	ParseSingleProp(&sTemp, &IFCTYPE.p04void);
+	
+	ENDREADIFCOBJ(IFCPROPERTYSINGLEVALUES);
+}
+
+
+/*
+void IFCDOORRELOBJECTS::ReadRelDefinesByPropertiesAfterRead()
+{
+	
+	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
+	{
+		for (int i = 0; i < IFCDOORSTYLES.size(); i++)
+		{
+			if (IFCRELDEFINESBYTYPES[n].p06RelatingType_str == IFCDOORSTYLES[i].p00IfcId)
+			{
+				IFCRELDEFINESBYTYPES[n].p06RelatingType = i;
+			}
+		}
+	}
+
+	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
+	{
+		if (IFCRELDEFINESBYTYPES[n].p06RelatingType == RELUNDEFINED)
+			continue;
+		for (int i = 0; i < IFCDOORSTYLES.size(); i++)
+		{
+
+			if (IFCDOORSTYLES[IFCRELDEFINESBYTYPES[n].p06RelatingType].p00IfcId == IFCDOORSTYLES[i].p00IfcId)
+			{
+
+				for (int k = 0; k < IFCRELDEFINESBYTYPES[n].p05RelatedObjects.size(); k++)
+				{
+					for (int j = 0; j < IFCDOORS.size(); j++)
+
+					{
+						if (IFCRELDEFINESBYTYPES[n].p05RelatedObjects[k] == IFCDOORS[j].p00IfcId)
+						{
+							IFCRELDEFINESBYTYPES[n].p05RelatedDoors.push_back(j);
+							IFCDOORS[j].relationsToList[r01_Doorstyle] = i;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+*/
+
 
 //Material
 
@@ -138,11 +244,12 @@ void IFCDOORRELOBJECTS::ReadRelAssociatesMaterials(std::string temp)
 	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
 	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
 	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
-	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects);
-	ParseSinglePropEnd(&sTemp, &IFCTYPE.p06RelatingType_str);
+	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects_str);
+	ParseSinglePropEnd(&sTemp, &IFCTYPE.p06RelatingObject_str);
 	ENDREADIFCOBJ(IFCRELASSOCIATESMATERIALS);
 }
 
+/*
 void IFCDOORRELOBJECTS::ReadRelAssociatesMaterialsAfterRead()
 {
 	for (int n = 0; n < IFCRELASSOCIATESMATERIALS.size(); n++)
@@ -173,7 +280,7 @@ void IFCDOORRELOBJECTS::ReadRelAssociatesMaterialsAfterRead()
 						if (IFCRELASSOCIATESMATERIALS[n].p05RelatedObjects[k] == IFCDOORS[j].p00IfcId)
 						{
 							IFCRELASSOCIATESMATERIALS[n].p05RelatedDoors.push_back(j);
-							IFCDOORS[j].shpMateriallist = i;
+							IFCDOORS[j].relationsToList[r02_Materiallist] = i;
 						}
 					}
 				}
@@ -181,7 +288,7 @@ void IFCDOORRELOBJECTS::ReadRelAssociatesMaterialsAfterRead()
 		}
 	}
 }
-
+*/
 
 
 // Main read function
@@ -215,13 +322,18 @@ void ReadFromIFC(LPWSTR szFile, IFCDOORRELOBJECTS* IFCS)
 
 		if (temp.find(IFCMATERIALLIST().ParseID) != std::string::npos)
 			IFCS->ReadIfcMateriallists(temp);
-
 		if (temp.find(IFCMATERIAL().ParseID) != std::string::npos)
 			IFCS->ReadIfcMaterials(temp);
-
 		if (temp.find(IFCRELASSOCIATESMATERIAL().ParseID) != std::string::npos)
 			IFCS->ReadRelAssociatesMaterials(temp);
-		
+
+		if (temp.find(IFCPROPERTYSET().ParseID) != std::string::npos)
+			IFCS->ReadPropertySets(temp);
+		if (temp.find(IFCPROPERTYSINGLEVALUE().ParseID) != std::string::npos)
+			IFCS->ReadPropertySingleValues(temp);
+		if (temp.find(IFCRELDEFINESBYPROPERTIES().ParseID) != std::string::npos)
+			IFCS->ReadRelDefinesByProperties(temp);
+
 
 	}
 	

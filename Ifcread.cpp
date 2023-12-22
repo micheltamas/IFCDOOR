@@ -75,47 +75,7 @@ void IFCDOORRELOBJECTS::ReadRelDefByTypes(std::string temp)
 	ENDREADIFCOBJ(IFCRELDEFINESBYTYPES);
 }
 
-/*
-void IFCDOORRELOBJECTS::ReadRelDefByTypesAfterRead()
-{
-	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
-	{
-		for (int i = 0; i < IFCDOORSTYLES.size(); i++)
-		{
-			if (IFCRELDEFINESBYTYPES[n].p06RelatingType_str == IFCDOORSTYLES[i].p00IfcId)
-			{
-				IFCRELDEFINESBYTYPES[n].p06RelatingType = i;
-			}
-		}
-	}
-	
-	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
-	{
-		if (IFCRELDEFINESBYTYPES[n].p06RelatingType == RELUNDEFINED)
-			continue;
-		for (int i = 0; i < IFCDOORSTYLES.size(); i++)
-		{
 
-			if (IFCDOORSTYLES[IFCRELDEFINESBYTYPES[n].p06RelatingType].p00IfcId == IFCDOORSTYLES[i].p00IfcId)
-			{
-
-				for (int k = 0; k < IFCRELDEFINESBYTYPES[n].p05RelatedObjects.size(); k++)
-				{
-					for (int j = 0; j < IFCDOORS.size(); j++)
-
-					{
-						if (IFCRELDEFINESBYTYPES[n].p05RelatedObjects[k] == IFCDOORS[j].p00IfcId)
-						{
-							IFCRELDEFINESBYTYPES[n].p05RelatedDoors.push_back(j);
-							IFCDOORS[j].shpDoorstyle = i;
-						}
-					}
-				}
-			}
-		}
-	}
-}
-*/
 //Properties
 
 
@@ -173,51 +133,6 @@ void IFCDOORRELOBJECTS::ReadPropertySingleValues(std::string temp)
 	
 	ENDREADIFCOBJ(IFCPROPERTYSINGLEVALUES);
 }
-
-
-
-/*
-void IFCDOORRELOBJECTS::ReadRelDefinesByPropertiesAfterRead()
-{
-	
-	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
-	{
-		for (int i = 0; i < IFCDOORSTYLES.size(); i++)
-		{
-			if (IFCRELDEFINESBYTYPES[n].p06RelatingType_str == IFCDOORSTYLES[i].p00IfcId)
-			{
-				IFCRELDEFINESBYTYPES[n].p06RelatingType = i;
-			}
-		}
-	}
-
-	for (int n = 0; n < IFCRELDEFINESBYTYPES.size(); n++)
-	{
-		if (IFCRELDEFINESBYTYPES[n].p06RelatingType == RELUNDEFINED)
-			continue;
-		for (int i = 0; i < IFCDOORSTYLES.size(); i++)
-		{
-
-			if (IFCDOORSTYLES[IFCRELDEFINESBYTYPES[n].p06RelatingType].p00IfcId == IFCDOORSTYLES[i].p00IfcId)
-			{
-
-				for (int k = 0; k < IFCRELDEFINESBYTYPES[n].p05RelatedObjects.size(); k++)
-				{
-					for (int j = 0; j < IFCDOORS.size(); j++)
-
-					{
-						if (IFCRELDEFINESBYTYPES[n].p05RelatedObjects[k] == IFCDOORS[j].p00IfcId)
-						{
-							IFCRELDEFINESBYTYPES[n].p05RelatedDoors.push_back(j);
-							IFCDOORS[j].relationsToList[r01_Doorstyle] = i;
-						}
-					}
-				}
-			}
-		}
-	}
-}
-*/
 
 
 //Material

@@ -1,18 +1,18 @@
 #include "Ifcread.h"
 
-std::map<std::string, int> PSDC{
-	{"Reference", 0},
-	{"FireRating", 1},
-	{"AcousticRating", 2},
-	{"SecurityRating", 3},
-	{"IsExternal", 4},
-	{"Infiltration", 5},
-	{"ThermalTransmittance", 6},
-	{"GlazingAreaFraction", 7},
-	{"HandicapAccessible", 8},
-	{"FireExit", 9},
-	{"SelfClosing", 10},
-	{"SmokeStop", 11}
+std::map<int, std::string> PSDC{
+	{8,"Reference"},
+	{9,"FireRating"},
+	{10,"AcousticRating"},
+	{11,"SecurityRating"},
+	{12, "IsExternal"},
+	{13, "Infiltration"},
+	{14, "ThermalTransmittance"},
+	{15, "GlazingAreaFraction"},
+	{16, "HandicapAccessible"},
+	{17,"FireExit"},
+	{18,"SelfClosing"},
+	{19,"SmokeStop"}
 };
 
 
@@ -142,7 +142,22 @@ void IFCDOORRELOBJECTS::ReadPropertySets(std::string temp)
 	ParseSingleProp(&sTemp, &IFCTYPE.p02OwnerHistory);
 	ParseSingleProp(&sTemp, &IFCTYPE.p03Name);
 	ParseSingleProp(&sTemp, &IFCTYPE.p04Description);
-	ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects_str);
+	//ParseMultiPropBrace(&sTemp, &IFCTYPE.p05RelatedObjects_str);
+
+	std::vector<std::string> to_store;
+	ParseMultiPropBrace(&sTemp, &to_store);
+
+	for (int k = 0; k < to_store.size(); k++)
+	{
+		for (int j = 0; j < IFCPROPERTYSINGLEVALUES.size(); j++)
+
+		{
+			if (to_store[k] == IFCPROPERTYSINGLEVALUES[j].p00IfcId)
+			{
+				IFCTYPE.p05RelatedObjects.push_back(j);
+			}
+		}
+	}
 
 	ENDREADIFCOBJ(IFCPROPERTYSETS);
 }
@@ -158,6 +173,7 @@ void IFCDOORRELOBJECTS::ReadPropertySingleValues(std::string temp)
 	
 	ENDREADIFCOBJ(IFCPROPERTYSINGLEVALUES);
 }
+
 
 
 /*

@@ -30,7 +30,7 @@ WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
 OPENFILENAMEW ofn;
 HWND mTable;
 IFCDOORRELOBJECTS IFCS;
-const int ColNumbers = 7;
+const int ColNumbers = 19;
 
 wchar_t szFile[1000]; // buffer for file name
 
@@ -231,6 +231,15 @@ static void _LvUpdate_New(HWND hWnd, HWND mTable, IFCDOORRELOBJECTS * IFCS)
         lvi.iItem = index;
         lvi.iSubItem = Pos++;
         SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
+
+        for (int n = 0; n < PSET_DOORCOM_MAX; n++)
+        {
+            lvi.mask = LVIF_TEXT;
+            lvi.pszText = const_cast<LPWSTR>(iDoor.ws_p08_DefinedfProperties[n].c_str());
+            lvi.iItem = index;
+            lvi.iSubItem = Pos++;
+            SendMessage(mTable, LVM_SETITEM, 0, (LPARAM)&lvi);
+        }
     }
     SetWindowText(hWnd, szTitle.c_str());
     UpdateWindow(mTable);
@@ -249,8 +258,13 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
             LV_COLUMN   lvColumn;
             
-            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NAME"),TEXT("MATERIAL LIST"), TEXT("IFCDOOR NAME"), TEXT("Heigth [mm]"), TEXT("Width [mm]"), TEXT("Operation") };
-            int Wdth[11] = { 40,220,250,250,80,80,150};
+            auto const cw_WIDE = 250;
+            auto const cw_MID = 150;
+            auto const cw_SMALL = 80;
+            auto const cw_VSMALL = 40;
+
+            TCHAR       szString[ColNumbers][30] = { TEXT("#"),TEXT("IFCDOORSTYLE NÉV"),TEXT("FELHASZNÁLT ANYAGOK"), TEXT("IFCDOOR NÉV"), TEXT("Magasság [mm]"), TEXT("Szélesség [mm]"), TEXT("Mûködési mód"), TEXT("Referencia"), TEXT("Tûzállóság"), TEXT("Akusztikai besorolás"), TEXT("Biztonsági besorolás"), TEXT("Kültérre nyíló?"), TEXT("Légáteresztés [m3/s]"), TEXT("Hõátbocsájtás U[W/m2K]"), TEXT("Üvegezés aránya"), TEXT("Akadálymentesen használható"), TEXT("Tûzeseti menekülés"), TEXT("Önzáró"), TEXT("Füstgátló") };
+            int Wdth[19] = { cw_VSMALL,cw_WIDE,cw_WIDE,cw_WIDE,cw_SMALL,cw_SMALL,cw_MID, cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID ,cw_MID };
             ListView_DeleteAllItems(mTable);
 
             lvColumn.mask = LVCF_FMT | LVCF_WIDTH | LVCF_TEXT | LVCF_SUBITEM;
@@ -264,6 +278,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
                 lvColumn.fmt = i > ColNumbers+  1 ? LVCFMT_RIGHT : LVCFMT_LEFT;
                 ListView_InsertColumn(mTable, i, &lvColumn);
             }
+
+            auto const szTitleInit = TEXT("Építmény-információs alapismeretek féléves feladat - BMEEOFTTBI1 - IFCDOOR  2023");
+            SetWindowText(hWnd, szTitleInit);
 
         }
         break;
